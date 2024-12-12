@@ -9,16 +9,18 @@ public class Task {
     private long taskCreated;
     private boolean isCompleted;
     private String userId;
+    private String taskStatus;
 
     public Task() {}
 
-    public Task(String taskId, String taskTitle, String taskDescription, long taskCreated, boolean isCompleted, String userId) {
+    public Task(String taskId, String taskTitle, String taskDescription, long taskCreated, boolean isCompleted, String userId, String taskStatus) {
         this.taskId = taskId;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;
         this.taskCreated = taskCreated;
         this.isCompleted = isCompleted;
         this.userId = userId;
+        this.taskStatus = taskStatus;
     }
 
 
@@ -39,4 +41,12 @@ public class Task {
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public String getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
+    }
 }
