@@ -1,24 +1,61 @@
 package com.example.final_project;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private BottomNavigationView bottomNav;
+    private TextView tvFullName, tvEmail;
+    private Button btnEditProfile;
+
+    private FirebaseAuth mAuth;
+    private DatabaseReference dbRef;
+
+    private final ActivityResultLauncher<Intent> editProfileLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK) {
+                            fetchUserProfile();
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        bottomNav = findViewById(R.id.bottomnav);
+        mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser().getUid();
+        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("users").child(userId);
 
+        tvFullName = findViewById(R.id.tvFullName);
+        tvEmail = findViewById(R.id.tvEmail);
+        btnEditProfile = findViewById(R.id.btnEditProfile);
+
+        fetchUserProfile();
+
+        btnEditProfile.setOnClickListener(v -> {
+            Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+
+            editIntent.putExtra("fullName", tvFullName.getText().toString());
+            editIntent.putExtra("email", tvEmail.getText().toString());
+            editProfileLauncher.launch(editIntent);
+        });
 
         findViewById(R.id.btnChangePassword).setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, ChangePasswordActivity.class);
@@ -32,34 +69,30 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
 
+    private void fetchUserProfile() {
+        String userId = mAuth.getCurrentUser().getUid();
 
-        bottomNav.setSelectedItemId(R.id.navigation_account);
-        bottomNav.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.navigation_account:
-                    return true;
-                case R.id.navigation_tasks:
-                    startActivity(new Intent(getApplicationContext(),  MainActivity.class));
-                    finish();
-                    return true;
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        String fullName = user.getFirstName() + " " + user.getLastName();
+                        tvFullName.setText(fullName);
+                        tvEmail.setText(user.getEmail());
+                    }
+                } else {
+                    Toast.makeText(ProfileActivity.this, "User profile not found", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                case R.id.navigation_calendar:
-                    startActivity(new Intent(getApplicationContext(), CalendarPage.class));
-                    finish();
-                    return  true;
-
-                case R.id.navigation_home:
-                    startActivity(new Intent(getApplicationContext(), DashBoard.class));
-                    finish();
-                    return  true;
-
-                default:
-                    return false;
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Error fetching profile", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
-
-
 }
