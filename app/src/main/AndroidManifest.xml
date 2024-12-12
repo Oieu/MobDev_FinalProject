@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -14,7 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_Project"
         tools:targetApi="31">
-
+        <activity
+            android:name=".DashBoard"
+            android:exported="false" />
         <activity
             android:name=".AddTask"
             android:exported="false" />
@@ -27,18 +30,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".RegistrationPage"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
-        <activity android:name=".ProfileActivity"
-            android:exported="false"/>
-
-        <activity android:name=".CalendarPage"
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CalendarPage"
             android:exported="false" />
     </application>
 

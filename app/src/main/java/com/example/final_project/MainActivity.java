@@ -75,13 +75,23 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    startActivity(new Intent(this, MainActivity.class));
+                case R.id.navigation_tasks:
                     return true;
                 case R.id.navigation_calendar:
-                    startActivity(new Intent(this, CalendarPage.class));
+                    startActivity(new Intent(getApplicationContext(), CalendarPage.class));
+                    finish();
                     return true;
-                // Add more navigation items here
+
+                case R.id.navigation_home:
+                    startActivity(new Intent(getApplicationContext(), DashBoard.class));
+                    finish();
+                    return true;
+
+                case R.id.navigation_account:
+                    startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                    finish();
+                    return true;
+
                 default:
                     return false;
             }
