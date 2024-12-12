@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         inProgressRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         completedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        fetchUserFirstName(userId);
         fetchTasksFromFirebase();
 
         btnAddTask.setOnClickListener(v -> {
@@ -95,6 +96,29 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
                 default:
                     return false;
+            }
+        });
+    }
+
+    private void fetchUserFirstName(String userId) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (user != null) {
+                        String firstName = user.getFirstName();
+                        tvWelcome.setText("Welcome, " + firstName + "!"); // Set the welcome message
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "User  not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(MainActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
             }
         });
     }
