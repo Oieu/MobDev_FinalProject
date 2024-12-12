@@ -2,6 +2,7 @@ package com.example.final_project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +37,7 @@ public class DashBoard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
+        // Initialize views
         bottomNav = findViewById(R.id.bottomnav);
         tvGreeting = findViewById(R.id.tvGreeting);
         tvDateTime = findViewById(R.id.tvDateTime);
@@ -43,17 +45,25 @@ public class DashBoard extends AppCompatActivity {
         tvPendingTasks = findViewById(R.id.tvPendingTasks);
         todayTaskRecyclerView = findViewById(R.id.todaystaskrecycler);
 
+        // Firebase instances
         mAuth = FirebaseAuth.getInstance();
-        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("tasks");
+        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("tasks");
 
-        String userId = mAuth.getCurrentUser().getUid();
-        fetchUserName(userId);
-        fetchCompletedTasksCount(userId);
-        fetchPendingTasksCount(userId);
-        fetchTasksForToday(userId);
+        // Fetch user data and tasks
+        String userId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
+        if (userId != null) {
+            fetchUserName(userId);
+            fetchCompletedTasksCount(userId);
+            fetchPendingTasksCount(userId);
+            fetchTasksForToday(userId);
+        } else {
+            Log.e("DashBoard", "User ID is null. Make sure the user is logged in.");
+        }
+
+        // Display current date and time
         displayCurrentDateTime();
 
+        // Bottom navigation setup
         bottomNav.setSelectedItemId(R.id.navigation_home);
         bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -76,6 +86,7 @@ public class DashBoard extends AppCompatActivity {
             }
         });
 
+        // RecyclerView setup
         todayTaskRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         taskList = new ArrayList<>();
         taskAdapter = new DashboardTaskAdapter(taskList);
@@ -83,8 +94,7 @@ public class DashBoard extends AppCompatActivity {
     }
 
     private void fetchUserName(String userId) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("Users");
+        DatabaseReference userRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference("Users");
         userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -94,12 +104,14 @@ public class DashBoard extends AppCompatActivity {
                         String greeting = "Hello " + user.getFirstName() + " " + user.getLastName();
                         tvGreeting.setText(greeting);
                     }
+                } else {
+                    Log.d("DashBoard", "User data not found.");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle possible errors.
+                Log.e("DashBoard", "Error fetching user name: " + databaseError.getMessage());
             }
         });
     }
@@ -111,17 +123,17 @@ public class DashBoard extends AppCompatActivity {
                 int completedTasksCount = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-
-                    if (task != null && !task.isDeleted() && task.getTaskStatus().equals("completed")) {
+                    if (task != null && !task.isDeleted() && "completed".equalsIgnoreCase(task.getTaskStatus())) {
                         completedTasksCount++;
                     }
                 }
                 tvCompletedTasks.setText(String.valueOf(completedTasksCount));
+                Log.d("DashBoard", "Completed Tasks Count: " + completedTasksCount);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
+                Log.e("DashBoard", "Error fetching completed tasks: " + databaseError.getMessage());
             }
         });
     }
@@ -133,17 +145,17 @@ public class DashBoard extends AppCompatActivity {
                 int pendingTasksCount = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-
                     if (task != null && !task.isDeleted() && "in progress".equalsIgnoreCase(task.getTaskStatus())) {
                         pendingTasksCount++;
                     }
                 }
                 tvPendingTasks.setText(String.valueOf(pendingTasksCount));
+                Log.d("DashBoard", "Pending Tasks Count: " + pendingTasksCount);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.e("DashBoard", "Error fetching pending tasks: " + databaseError.getMessage());
             }
         });
     }
@@ -161,21 +173,20 @@ public class DashBoard extends AppCompatActivity {
                         taskList.clear();
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             Task task = snapshot.getValue(Task.class);
-                            if (task != null && userId != null && userId.equals(task.getUserId()) && !task.isDeleted()) {
-                                taskList.add(task);  // Add only tasks that are not deleted
+                            if (task != null && userId.equals(task.getUserId()) && !task.isDeleted()) {
+                                taskList.add(task);
                             }
                         }
                         taskAdapter.notifyDataSetChanged();
+                        Log.d("DashBoard", "Today's Tasks Count: " + taskList.size());
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        // Handle error
+                        Log.e("DashBoard", "Error fetching today's tasks: " + databaseError.getMessage());
                     }
                 });
     }
-
-
 
     private long getStartOfDayInMillis(Date date) {
         Calendar calendar = Calendar.getInstance();
@@ -200,8 +211,8 @@ public class DashBoard extends AppCompatActivity {
     private void displayCurrentDateTime() {
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
-        timeFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Manila")); // Set to the local timezone
-        dateFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Manila")); // Set to the local timezone
+        timeFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Manila"));
+        dateFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Manila"));
 
         String currentTime = timeFormat.format(new Date());
         String currentDate = dateFormat.format(new Date());
