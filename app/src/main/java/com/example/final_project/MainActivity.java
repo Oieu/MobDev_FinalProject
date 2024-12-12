@@ -39,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid(); // Get the user ID
 
-        dbRef = FirebaseDatabase.getInstance()
-                .getReference("tasks");
+        dbRef = FirebaseDatabase.getInstance().getReference("tasks");
 
         inProgressRecyclerView = findViewById(R.id.in_progress_recyclerview);
         completedRecyclerView = findViewById(R.id.completed_recyclerview);
@@ -57,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         inProgressRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         completedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        fetchTasksForUser  (userId);
+        fetchTasksForUser(userId);
 
         findViewById(R.id.btnaddtask).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddTask.class);
@@ -72,19 +71,19 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_tasks:
                     return true;
                 case R.id.navigation_calendar:
-                    startActivity(new Intent(getApplicationContext(),  CalendarPage.class));
+                    startActivity(new Intent(getApplicationContext(), CalendarPage.class));
                     finish();
                     return true;
 
                 case R.id.navigation_home:
                     startActivity(new Intent(getApplicationContext(), DashBoard.class));
                     finish();
-                    return  true;
+                    return true;
 
                 case R.id.navigation_account:
                     startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                     finish();
-                    return  true;
+                    return true;
 
                 default:
                     return false;
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchTasksForUser (String userId) {
+    private void fetchTasksForUser(String userId) {
         listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -101,12 +100,14 @@ public class MainActivity extends AppCompatActivity {
 
                 for (DataSnapshot taskSnapshot : dataSnapshot.getChildren()) {
                     Task task = taskSnapshot.getValue(Task.class);
-                    if (task != null && !task.isCompleted()) {
+                    if (task != null) {
                         task.setTaskId(taskSnapshot.getKey());
+                        String taskStatus = task.getTaskStatus(); // Cache taskStatus
 
-                        if (task.getTaskStatus().equals("in progress")) {
+                        // Null-safe check for taskStatus
+                        if ("in progress".equals(taskStatus)) {
                             inProgressTaskList.add(task);
-                        } else if (task.getTaskStatus().equals("completed")) {
+                        } else if ("completed".equals(taskStatus)) {
                             completedTaskList.add(task);
                         }
                     }
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 inProgressTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
                     @Override
                     public void onTaskStatusChanged(Task task) {
-                        if (task.getTaskStatus().equals("completed")) {
+                        if ("completed".equals(task.getTaskStatus())) {
                             inProgressTaskList.remove(task);
                             completedTaskList.add(task);
                         } else {
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 completedTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
                     @Override
                     public void onTaskStatusChanged(Task task) {
-                        if (task.getTaskStatus().equals("in progress")) {
+                        if ("in progress".equals(task.getTaskStatus())) {
                             completedTaskList.remove(task);
                             inProgressTaskList.add(task);
                         } else {
@@ -161,5 +162,4 @@ public class MainActivity extends AppCompatActivity {
             dbRef.removeEventListener(listener);
         }
     }
-
 }
