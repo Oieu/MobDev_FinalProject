@@ -44,7 +44,7 @@ public class DashBoard extends AppCompatActivity {
         todayTaskRecyclerView = findViewById(R.id.todaystaskrecycler);
 
         mAuth = FirebaseAuth.getInstance();
-        dbRef = FirebaseDatabase.getInstance()
+        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("tasks");
 
         String userId = mAuth.getCurrentUser().getUid();
@@ -83,7 +83,7 @@ public class DashBoard extends AppCompatActivity {
     }
 
     private void fetchUserName(String userId) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance()
+        DatabaseReference userRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("Users");
         userRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -159,7 +159,7 @@ public class DashBoard extends AppCompatActivity {
                         taskList.clear();
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             Task task = snapshot.getValue(Task.class);
-                            if (task != null && task.getUserId().equals(userId)) {
+                            if (task != null && userId != null && userId.equals(task.getUserId())) {
                                 taskList.add(task);
                             }
                         }
@@ -172,6 +172,7 @@ public class DashBoard extends AppCompatActivity {
                     }
                 });
     }
+
 
     private long getStartOfDayInMillis(Date date) {
         Calendar calendar = Calendar.getInstance();

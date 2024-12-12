@@ -29,10 +29,12 @@ public class DashboardTaskAdapter extends RecyclerView.Adapter<DashboardTaskAdap
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = taskList.get(position);
-        holder.taskTitle.setText(task.getTaskTitle());
-        holder.taskDescription.setText(task.getTaskDescription());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
-        holder.taskCreatedDate.setText(dateFormat.format(new Date(task.getTaskCreated())));
+        if (task != null) {
+            holder.taskTitle.setText(task.getTaskTitle() != null ? task.getTaskTitle() : "No Title");
+            holder.taskDescription.setText(task.getTaskDescription() != null ? task.getTaskDescription() : "No Description");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+            holder.taskCreatedDate.setText(dateFormat.format(new Date(task.getTaskCreated())));
+        }
     }
 
     @Override

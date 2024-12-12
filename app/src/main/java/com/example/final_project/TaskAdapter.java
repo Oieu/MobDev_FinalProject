@@ -1,5 +1,6 @@
 package com.example.final_project;
 
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,13 +63,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.taskDate.setText("No Date");
         }
 
-        if (task.getTaskStatus().equals("completed")) {
+        String taskStatus = task.getTaskStatus() != null ? task.getTaskStatus() : "in progress";
+
+        if (taskStatus.equals("completed")) {
             holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             holder.cbTaskCompleted.setChecked(true);
         } else {
             holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             holder.cbTaskCompleted.setChecked(false);
         }
+
 
         holder.cbTaskCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);
