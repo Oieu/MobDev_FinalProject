@@ -41,7 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid();
         dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("users").child(userId);
+                .getReference("Users").child(userId);
 
         tvFullName = findViewById(R.id.tvFullName);
         tvEmail = findViewById(R.id.tvEmail);
@@ -51,7 +51,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnEditProfile.setOnClickListener(v -> {
             Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-
             editIntent.putExtra("fullName", tvFullName.getText().toString());
             editIntent.putExtra("email", tvEmail.getText().toString());
             editProfileLauncher.launch(editIntent);
@@ -72,16 +71,13 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void fetchUserProfile() {
-        String userId = mAuth.getCurrentUser().getUid();
-
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null) {
-                        String fullName = user.getFirstName() + " " + user.getLastName();
-                        tvFullName.setText(fullName);
+                        tvFullName.setText(user.getFirstName() + " " + user.getLastName());
                         tvEmail.setText(user.getEmail());
                     }
                 } else {
@@ -96,3 +92,4 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 }
+
