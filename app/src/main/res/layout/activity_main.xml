@@ -43,6 +43,7 @@
 <!--        app:layout_constraintBottom_toTopOf="@id/bottomnav" />-->
 
     <TextView
+        android:id="@+id/inprogresstext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="In Progress"
@@ -66,6 +67,7 @@
         app:layout_constraintBottom_toTopOf="@id/completed_recyclerview" />
 
     <TextView
+        android:id="@+id/completedtext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Completed"

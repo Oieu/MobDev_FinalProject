@@ -111,9 +111,9 @@ public class DashBoard extends AppCompatActivity {
                 int completedTasksCount = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-                    if (task != null && task.isCompleted()) {
-                        completedTasksCount++;
-                    }
+//                    if (task != null && task.isCompleted()) {
+//                        completedTasksCount++;
+//                    }
                 }
                 tvCompletedTasks.setText(String.valueOf(completedTasksCount));
             }
@@ -132,9 +132,9 @@ public class DashBoard extends AppCompatActivity {
                 int pendingTasksCount = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-                    if (task != null && !task.isCompleted()) {
-                        pendingTasksCount++;
-                    }
+//                    if (task != null && !task.isCompleted()) {
+//                        pendingTasksCount++;
+//                    }
                 }
                 tvPendingTasks.setText(String.valueOf(pendingTasksCount));
             }
