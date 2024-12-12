@@ -39,7 +39,7 @@ public class CalendarPage extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottomnav);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskList = new ArrayList<>();
-        taskAdapter = new TaskAdapter(taskList);
+        taskAdapter = new TaskAdapter(taskList, false);
         recyclerView.setAdapter(taskAdapter);
 
         dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")

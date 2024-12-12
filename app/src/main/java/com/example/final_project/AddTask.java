@@ -51,7 +51,7 @@ public class AddTask extends AppCompatActivity {
             return;
         }
 
-        Task task = new Task(taskId, taskTitle, taskDescription, currentDate, false, userId);
+        Task task = new Task(taskId, taskTitle, taskDescription, currentDate, false, userId, "in progress");
         dbRef.child(taskId).setValue(task)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(AddTask.this, "Task added", Toast.LENGTH_SHORT).show();
