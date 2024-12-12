@@ -24,10 +24,18 @@
             android:layout_marginBottom="24dp" />
 
         <EditText
-            android:id="@+id/etFullName"
+            android:id="@+id/etFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name"
+            android:hint="First Name"
+            android:paddingStart="8dp"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/etLastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Last Name"
             android:paddingStart="8dp"
             android:layout_marginBottom="16dp" />
 
@@ -45,6 +53,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
+            android:inputType="textPassword"
+            android:paddingStart="8dp"
+            android:layout_marginBottom="24dp" />
+
+        <EditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Confirm password"
             android:inputType="textPassword"
             android:paddingStart="8dp"
             android:layout_marginBottom="24dp" />
