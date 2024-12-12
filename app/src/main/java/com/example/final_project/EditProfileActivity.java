@@ -49,7 +49,8 @@ public class EditProfileActivity extends AppCompatActivity {
             String firstName = nameParts[0];
             String lastName = nameParts.length > 1 ? nameParts[1] : "";
 
-            User updatedUser = new User(userId, firstName, lastName, email);
+            User updatedUser = new User(userId, firstName, lastName, email, 0);
+
 
             dbRef.setValue(updatedUser).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {

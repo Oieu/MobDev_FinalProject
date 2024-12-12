@@ -39,7 +39,7 @@
                 android:contentDescription="Profile Picture"
                 android:src="@drawable/ic_profile_picture" />
 
-
+            <!-- Full Name -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,14 +50,13 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_person"
                     android:contentDescription="Full Name Icon"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Full Name"
+                    android:text="Name:"
                     android:textColor="@color/primaryColor"
                     android:textSize="16sp"
                     android:layout_marginEnd="16dp" />
@@ -71,7 +70,7 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-
+            <!-- Email -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -82,14 +81,13 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_email"
                     android:contentDescription="Email Icon"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email"
+                    android:text="Email:"
                     android:textColor="@color/primaryColor"
                     android:textSize="16sp"
                     android:layout_marginEnd="16dp" />
@@ -103,7 +101,7 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-
+            <!-- Task Summary -->
             <TextView
                 android:id="@+id/tvTaskSummary"
                 android:layout_width="wrap_content"
@@ -112,31 +110,53 @@
                 android:layout_marginBottom="8dp"
                 android:text="Task Summary"
                 android:textColor="@color/primaryColor"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:orientation="horizontal">
+                android:layout_margin="18dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                >
 
                 <TextView
-                    android:id="@+id/tvTotalTasks"
+                    android:id="@+id/tvPendingText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="Total Tasks: 0"
+                    android:layout_marginEnd="15dp"
+                    android:text="Pending:"
                     android:textColor="@color/primaryColor"
-                    android:textSize="16sp" />
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvPendingTasks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:text="0"
+                    android:textColor="@color/primaryColor"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvCompletedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:text="Completed:"
+                    android:textColor="@color/primaryColor"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/tvCompletedTasks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Completed: 0"
+                    android:text="0"
                     android:textColor="@color/primaryColor"
-                    android:textSize="16sp" />
+                    android:textSize="20sp" />
             </LinearLayout>
+
 
             <Button
                 android:id="@+id/btnEditProfile"
@@ -163,7 +183,6 @@
                 android:backgroundTint="@color/secondaryColor"
                 android:text="Logout"
                 android:textColor="@android:color/white" />
-
         </LinearLayout>
     </ScrollView>
 
