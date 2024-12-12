@@ -20,11 +20,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     private final List<Task> taskList;
     private final DatabaseReference dbRef;
+    private boolean isCompleted;
 
-    public TaskAdapter(List<Task> taskList) {
+    private OnTaskStatusChangedListener onTaskStatusChangedListener;
+
+    public interface OnTaskStatusChangedListener {
+        void onTaskStatusChanged(Task task);
+    }
+
+    public void setOnTaskStatusChangedListener(OnTaskStatusChangedListener onTaskStatusChangedListener) {
+        this.onTaskStatusChangedListener = onTaskStatusChangedListener;
+    }
+
+    public TaskAdapter(List<Task> taskList, boolean isCompleted) {
         this.taskList = taskList;
         this.dbRef = FirebaseDatabase.getInstance(FirebaseConfig.dbURL)
                 .getReference("tasks");
+        this.isCompleted = isCompleted;
     }
 
     @NonNull
@@ -41,7 +53,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.taskTitle.setText(task.getTaskTitle());
         holder.taskDescription.setText(task.getTaskDescription());
 
-
         if (task.getTaskCreated() != 0) {
             Date date = new Date(task.getTaskCreated());
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -51,12 +62,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.taskDate.setText("No Date");
         }
 
-//        holder.cbTaskCompleted.setChecked(task.isDone());
+        if (task.getTaskStatus().equals("completed")) {
+            holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.cbTaskCompleted.setChecked(true);
+        } else {
+            holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.cbTaskCompleted.setChecked(false);
+        }
 
         holder.cbTaskCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);
             if (task.getTaskId() != null) {
-                dbRef.child(task.getTaskId()).child("isCompleted").setValue(isChecked);
+                if (isChecked) {
+                    dbRef.child(task.getTaskId()).child("taskStatus").setValue("completed");
+                    dbRef.child(task.getTaskId()).child("isCompleted").setValue(true);
+                } else {
+                    dbRef.child(task.getTaskId()).child("taskStatus").setValue("in progress");
+                    dbRef.child(task.getTaskId()).child("isCompleted").setValue(false);
+                }
             }
         });
 
@@ -69,8 +92,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             }
         });
     }
-
-
 
     @Override
     public int getItemCount() {
