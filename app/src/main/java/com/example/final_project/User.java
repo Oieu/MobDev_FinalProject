@@ -1,17 +1,24 @@
 package com.example.final_project;
 
 public class User {
-    public String firstName;
-    public String lastName;
-    public String email;
+    private String userId;
+    private String firstName;
+    private String lastName;
+    private String email;
 
     public User() {}
 
-    public User(String firstName, String lastName, String email) {
+    public User(String userId, String firstName, String lastName, String email) {
+        this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
     }
+
+
+    public String getUserId() { return userId;}
+
+    public void setUserId(String userId) { this.userId = userId; }
 
     public String getFirstName() {
         return firstName;

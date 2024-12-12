@@ -1,23 +1,21 @@
 package com.example.final_project;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class AddTask extends AppCompatActivity {
 
     private TextInputEditText etTaskTitle, etTaskDescription;
     private MaterialButton btnSaveTask;
     private DatabaseReference dbRef;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +25,11 @@ public class AddTask extends AppCompatActivity {
         etTaskTitle = findViewById(R.id.ettasktitle);
         etTaskDescription = findViewById(R.id.ettaskdescription);
         btnSaveTask = findViewById(R.id.btnsavetask);
-        dbRef = FirebaseDatabase.getInstance(FirebaseConfig.dbURL)
+
+        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("tasks");
+
+        mAuth = FirebaseAuth.getInstance();
 
         btnSaveTask.setOnClickListener(v -> saveTaskToFirebase());
     }
@@ -37,6 +38,7 @@ public class AddTask extends AppCompatActivity {
         String taskTitle = etTaskTitle.getText().toString().trim();
         String taskDescription = etTaskDescription.getText().toString().trim();
         long currentDate = new Date().getTime();
+        String userId = mAuth.getCurrentUser().getUid();
 
         if (taskTitle.isEmpty() || taskDescription.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
@@ -49,7 +51,7 @@ public class AddTask extends AppCompatActivity {
             return;
         }
 
-        Task task = new Task(taskId, taskTitle, taskDescription, currentDate, false);
+        Task task = new Task(taskId, taskTitle, taskDescription, currentDate, false, userId);
         dbRef.child(taskId).setValue(task)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(AddTask.this, "Task added", Toast.LENGTH_SHORT).show();
@@ -59,4 +61,3 @@ public class AddTask extends AppCompatActivity {
     }
 
 }
-

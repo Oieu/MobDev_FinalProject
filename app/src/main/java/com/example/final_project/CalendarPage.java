@@ -3,25 +3,22 @@ package com.example.final_project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.widget.CalendarView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 public class CalendarPage extends AppCompatActivity {
 
@@ -30,12 +27,12 @@ public class CalendarPage extends AppCompatActivity {
     private TaskAdapter taskAdapter;
     private List<Task> taskList;
     private DatabaseReference dbRef;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar_page);
-
 
         calendarView = findViewById(R.id.calendarView);
         recyclerView = findViewById(R.id.CalendarrecyclerView);
@@ -45,19 +42,16 @@ public class CalendarPage extends AppCompatActivity {
         taskAdapter = new TaskAdapter(taskList);
         recyclerView.setAdapter(taskAdapter);
 
-
-        dbRef = FirebaseDatabase.getInstance(FirebaseConfig.dbURL)
+        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("tasks");
-
+        mAuth = FirebaseAuth.getInstance();
 
         loadTasksForDate(calendarView.getDate());
-
 
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             long selectedDateInMillis = getDateInMillis(year, month, dayOfMonth);
             loadTasksForDate(selectedDateInMillis);
         });
-
 
         bottomNav.setSelectedItemId(R.id.navigation_calendar);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -68,6 +62,14 @@ public class CalendarPage extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     finish();
                     return true;
+//                case R.id.navigation_tasks:
+//                    startActivity(new Intent(getApplicationContext(), TasksActivity.class));
+//                    finish();
+//                    return true;
+                case R.id.navigation_account:
+                    startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                    finish();
+                    return true;
                 default:
                     return false;
             }
@@ -75,43 +77,39 @@ public class CalendarPage extends AppCompatActivity {
     }
 
     private void loadTasksForDate(long dateInMillis) {
-        // Get the start and end timestamps for the selected date
+        String userId = mAuth.getCurrentUser().getUid();
         long startOfDay = getStartOfDayInMillis(dateInMillis);
         long endOfDay = getEndOfDayInMillis(dateInMillis);
 
         Log.d("CalendarPage", "Start of day: " + startOfDay);
         Log.d("CalendarPage", "End of day: " + endOfDay);
 
-        // Query Firebase for tasks created on the selected date
-        dbRef.orderByChild("taskCreated").startAt(startOfDay).endAt(endOfDay).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                taskList.clear();
-
-                if (!dataSnapshot.exists()) {
-                    Toast.makeText(CalendarPage.this, "No tasks found for this date", Toast.LENGTH_SHORT).show();
-                    Log.d("CalendarPage", "No tasks found for the selected date.");
-                }
-
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Task task = snapshot.getValue(Task.class);
-                    if (task != null) {
-                        taskList.add(task); // Add tasks to the list
+        dbRef.orderByChild("taskCreated").startAt(startOfDay).endAt(endOfDay)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        taskList.clear();
+                        if (!dataSnapshot.exists()) {
+                            Toast.makeText(CalendarPage.this, "No tasks found for this date", Toast.LENGTH_SHORT).show();
+                            Log.d("CalendarPage", "No tasks found for the selected date.");
+                        } else {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                Task task = snapshot.getValue(Task.class);
+                                if (task != null && task.getUserId().equals(userId)) {
+                                    taskList.add(task);
+                                }
+                            }
+                        }
+                        Log.d("CalendarPage", "Tasks found: " + taskList.size());
+                        taskAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the RecyclerView
                     }
-                }
 
-
-                Log.d("CalendarPage", "Tasks found: " + taskList.size());
-
-                taskAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the RecyclerView
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
-                Log.e("CalendarPage", "Database error: " + databaseError.getMessage());
-            }
-        });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Handle error
+                        Log.e("CalendarPage", "Database error: " + databaseError.getMessage());
+                    }
+                });
     }
 
     private long getDateInMillis(int year, int month, int day) {
