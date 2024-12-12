@@ -75,15 +75,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
 
         holder.cbTaskCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            task.setCompleted(isChecked);
             if (task.getTaskId() != null) {
-                if (isChecked) {
-                    dbRef.child(task.getTaskId()).child("taskStatus").setValue("completed");
-                    dbRef.child(task.getTaskId()).child("isCompleted").setValue(true);
-                } else {
-                    dbRef.child(task.getTaskId()).child("taskStatus").setValue("in progress");
-                    dbRef.child(task.getTaskId()).child("isCompleted").setValue(false);
-                }
+                // Update task status based on checkbox state
+                String newStatus = isChecked ? "completed" : "in progress";
+                dbRef.child(task.getTaskId()).child("taskStatus").setValue(newStatus)
+                        .addOnSuccessListener(aVoid -> {
+                            // Optionally notify the listener if set
+                            if (onTaskStatusChangedListener != null) {
+                                task.setTaskStatus(newStatus);
+                                onTaskStatusChangedListener.onTaskStatusChanged(task);
+                            }
+                        });
             }
         });
 

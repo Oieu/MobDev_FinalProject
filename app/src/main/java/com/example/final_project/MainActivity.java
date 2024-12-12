@@ -38,21 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid(); // Get the user ID
-
         dbRef = FirebaseDatabase.getInstance().getReference("tasks");
-
         inProgressRecyclerView = findViewById(R.id.in_progress_recyclerview);
         completedRecyclerView = findViewById(R.id.completed_recyclerview);
-
         inProgressTaskList = new ArrayList<>();
         completedTaskList = new ArrayList<>();
-
         inProgressTaskAdapter = new TaskAdapter(inProgressTaskList, false);
         completedTaskAdapter = new TaskAdapter(completedTaskList, true);
-
         inProgressRecyclerView.setAdapter(inProgressTaskAdapter);
         completedRecyclerView.setAdapter(completedTaskAdapter);
-
         inProgressRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         completedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -102,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
                     Task task = taskSnapshot.getValue(Task.class);
                     if (task != null) {
                         task.setTaskId(taskSnapshot.getKey());
-                        String taskStatus = task.getTaskStatus(); // Cache taskStatus
+                        String taskStatus = task.getTaskStatus();
 
-                        // Null-safe check for taskStatus
+
                         if ("in progress".equals(taskStatus)) {
                             inProgressTaskList.add(task);
                         } else if ("completed".equals(taskStatus)) {
@@ -113,39 +107,41 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                inProgressTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
-                    @Override
-                    public void onTaskStatusChanged(Task task) {
-                        if ("completed".equals(task.getTaskStatus())) {
-                            inProgressTaskList.remove(task);
-                            completedTaskList.add(task);
-                        } else {
-                            inProgressTaskList.add(task);
-                            completedTaskList.remove(task);
+                inProgressTaskAdapter.setOnTaskStatusChangedListener(task -> {
+                    if ("completed".equals(task.getTaskStatus())) {
+                        if (inProgressTaskList.remove(task)) { // Only remove if it exists
+                            completedTaskList.add(task); // Add to completed
                         }
-                        inProgressTaskAdapter.notifyDataSetChanged();
-                        completedTaskAdapter.notifyDataSetChanged();
+                    } else {
+                        if (completedTaskList.remove(task)) { // Only remove if it exists
+                            inProgressTaskList.add(task); // Add to in-progress
+                        }
                     }
+                    notifyAdapters();
                 });
 
-                completedTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
-                    @Override
-                    public void onTaskStatusChanged(Task task) {
-                        if ("in progress".equals(task.getTaskStatus())) {
-                            completedTaskList.remove(task);
-                            inProgressTaskList.add(task);
-                        } else {
-                            completedTaskList.add(task);
-                            inProgressTaskList.remove(task);
+                completedTaskAdapter.setOnTaskStatusChangedListener(task -> {
+                    if ("in progress".equals(task.getTaskStatus())) {
+                        if (completedTaskList.remove(task)) { // Only remove if it exists
+                            inProgressTaskList.add(task); // Add to in-progress
                         }
-                        inProgressTaskAdapter.notifyDataSetChanged();
-                        completedTaskAdapter.notifyDataSetChanged();
+                    } else {
+                        if (inProgressTaskList.remove(task)) { // Only remove if it exists
+                            completedTaskList.add(task); // Add to completed
+                        }
                     }
+                    notifyAdapters();
                 });
 
+
+
+            }
+
+            private void notifyAdapters() {
                 inProgressTaskAdapter.notifyDataSetChanged();
                 completedTaskAdapter.notifyDataSetChanged();
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -163,3 +159,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
+

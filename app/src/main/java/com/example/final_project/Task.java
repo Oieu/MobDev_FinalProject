@@ -34,8 +34,6 @@ public class Task {
     public long getTaskCreated() { return taskCreated; }
     public void setTaskCreated(long taskCreated) { this.taskCreated = taskCreated; }
 
-    public boolean isCompleted() { return isCompleted; }
-    public void setCompleted(boolean completed) { isCompleted = completed; }
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }

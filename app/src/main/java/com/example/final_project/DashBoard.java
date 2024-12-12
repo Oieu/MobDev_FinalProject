@@ -49,8 +49,7 @@ public class DashBoard extends AppCompatActivity {
 
         String userId = mAuth.getCurrentUser().getUid();
         fetchUserName(userId);
-        fetchCompletedTasksCount(userId);
-        fetchPendingTasksCount(userId);
+        fetchTaskCounts(userId);
         fetchTasksForToday(userId);
         displayCurrentDateTime();
 
@@ -104,39 +103,26 @@ public class DashBoard extends AppCompatActivity {
         });
     }
 
-    private void fetchCompletedTasksCount(String userId) {
-        dbRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int completedTasksCount = 0;
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Task task = snapshot.getValue(Task.class);
-                    if (task != null && task.isCompleted()) {
-                        completedTasksCount++;
-                    }
-                }
-                tvCompletedTasks.setText(String.valueOf(completedTasksCount));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
-            }
-        });
-    }
-
-    private void fetchPendingTasksCount(String userId) {
+    private void fetchTaskCounts(String userId) {
         dbRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int pendingTasksCount = 0;
+                int completedTasksCount = 0;
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-                    if (task != null && !task.isCompleted()) {
-                        pendingTasksCount++;
+                    if (task != null) {
+                        if ("in progress".equals(task.getTaskStatus())) {
+                            pendingTasksCount++;
+                        } else if ("completed".equals(task.getTaskStatus())) {
+                            completedTasksCount++;
+                        }
                     }
                 }
+
                 tvPendingTasks.setText(String.valueOf(pendingTasksCount));
+                tvCompletedTasks.setText(String.valueOf(completedTasksCount));
             }
 
             @Override
