@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/baseline_home_24"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/navigation_discover"
+
+        android:icon="@drawable/baseline_calendar_month_24"
+        android:title="Calendar" />
+
+    <item
+        android:id="@+id/navigation_likes"
+
+        android:icon= "@drawable/baseline_task_alt_24"
+        android:title="Tasks" />
+
+    <item
+        android:id="@+id/navigation_account"
+        android:icon="@drawable/baseline_person_24"
+        android:title="Profile" />
+
+</menu>
