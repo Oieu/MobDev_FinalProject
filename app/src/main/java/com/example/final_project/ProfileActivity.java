@@ -13,22 +13,28 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        BottomNavigationView bottomNav = findViewById(R.id.bottomnav);
 
-        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) BottomNavigationView bottomNavigationView = findViewById(R.id.bottomnav);
-        bottomNavigationView.setSelectedItemId(R.id.navigation_account);
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+          bottomNav.setSelectedItemId(R.id.navigation_account);
+        bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_account:
-
                     return true;
                 case R.id.navigation_home:
-
-                    startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    finish();
                     return true;
 
+                case R.id.navigation_calendar:
+                    startActivity(new Intent(getApplicationContext(), CalendarPage.class));
+                    finish();
+                    return  true;
+                default:
+                    return false;
             }
-            return false;
         });
     }
+
+
+
 }

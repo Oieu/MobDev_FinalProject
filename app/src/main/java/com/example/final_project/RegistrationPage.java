@@ -8,9 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -39,10 +37,11 @@ public class RegistrationPage extends AppCompatActivity {
         backToLogin = findViewById(R.id.tvLoginLink);
 
         mAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference("Users");
+        databaseReference = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("Users");
 
         btnRegister.setOnClickListener(v -> {
-            if(isPasswordMatching()){
+            if (isPasswordMatching()) {
                 registerUser();
             } else {
                 Toast.makeText(getApplicationContext(), "Passwords did not match",
@@ -55,42 +54,6 @@ public class RegistrationPage extends AppCompatActivity {
             startActivity(intent);
         });
     }
-
-//    public void registerUser(){
-//        String firstName = etFirstName.getText().toString().trim();
-//        String lastName = etLastName.getText().toString().trim();
-//        String email = etEmail.getText().toString().trim();
-//        String password = etPassword.getText().toString().trim();
-//        String confirmPassword = etConfirmPassword.getText().toString().trim();
-//
-//        if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
-//                TextUtils.isEmpty(email) || TextUtils.isEmpty(password) ||
-//                TextUtils.isEmpty(confirmPassword)) {
-//            Toast.makeText(RegistrationPage.this, "Please fill in all fields",
-//                    Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        if(password.length() < 8){
-//            etPassword.setError("Password must be greater than 8 characters.");
-//            return;
-//        }
-//
-//        mAuth.createUserWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(this, task -> {
-//                    if (task.isSuccessful()) {
-//                        Toast.makeText(RegistrationPage.this,
-//                                "Registration successful",
-//                                Toast.LENGTH_SHORT).show();
-//                        Intent intent = new Intent(RegistrationPage.this, MainActivity.class);
-//                        startActivity(intent);
-//                    } else {
-//                        Toast.makeText(RegistrationPage.this,
-//                                "Registration failed. Please try again",
-//                                Toast.LENGTH_LONG).show();
-//                    }
-//                });
-//    }
 
     public void registerUser() {
         String firstName = etFirstName.getText().toString().trim();
@@ -115,13 +78,12 @@ public class RegistrationPage extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Get the current user's unique ID
                         String userId = mAuth.getCurrentUser().getUid();
 
-                        // Create a User object to store in the database
-                        User user = new User(firstName, lastName, email);
 
-                        // Save the user object in the database under the user's UID
+                        User user = new User(userId, firstName, lastName, email);
+
+
                         databaseReference.child(userId).setValue(user)
                                 .addOnCompleteListener(dbTask -> {
                                     if (dbTask.isSuccessful()) {
@@ -145,7 +107,7 @@ public class RegistrationPage extends AppCompatActivity {
                 });
     }
 
-    public boolean isPasswordMatching(){
+    public boolean isPasswordMatching() {
         String password = etPassword.getText().toString().trim();
         String confirmPass = etConfirmPassword.getText().toString().trim();
         return password.equals(confirmPass);
