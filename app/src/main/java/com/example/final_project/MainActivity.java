@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             startActivity(intent);
         });
 
+        bottomNav.setSelectedItemId(R.id.navigation_tasks);
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_tasks:

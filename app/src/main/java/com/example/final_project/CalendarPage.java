@@ -24,7 +24,7 @@ public class CalendarPage extends AppCompatActivity {
 
     private CalendarView calendarView;
     private RecyclerView recyclerView;
-    private TaskAdapter taskAdapter;
+    private CalendarRecAdapter calendarRecAdapter;
     private List<Task> taskList;
     private DatabaseReference dbRef;
     private FirebaseAuth mAuth;
@@ -34,24 +34,31 @@ public class CalendarPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar_page);
 
+
         calendarView = findViewById(R.id.calendarView);
         recyclerView = findViewById(R.id.CalendarrecyclerView);
         BottomNavigationView bottomNav = findViewById(R.id.bottomnav);
+
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskList = new ArrayList<>();
-//        taskAdapter = new TaskAdapter(taskList);
-        recyclerView.setAdapter(taskAdapter);
+        calendarRecAdapter = new CalendarRecAdapter(taskList);
+        recyclerView.setAdapter(calendarRecAdapter);
+
 
         dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("tasks");
         mAuth = FirebaseAuth.getInstance();
 
+
         loadTasksForDate(calendarView.getDate());
+
 
         calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             long selectedDateInMillis = getDateInMillis(year, month, dayOfMonth);
             loadTasksForDate(selectedDateInMillis);
         });
+
 
         bottomNav.setSelectedItemId(R.id.navigation_calendar);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -88,29 +95,31 @@ public class CalendarPage extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        taskList.clear();
+                        List<Task> updatedTaskList = new ArrayList<>();
                         if (!dataSnapshot.exists()) {
                             Toast.makeText(CalendarPage.this, "No tasks found for this date", Toast.LENGTH_SHORT).show();
                             Log.d("CalendarPage", "No tasks found for the selected date.");
                         } else {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 Task task = snapshot.getValue(Task.class);
-                                if (task != null && task.getUserId().equals(userId)) {
-                                    taskList.add(task);
+                                if (task != null && task.getUserId().equals(userId) && !task.isDeleted()) {
+                                    updatedTaskList.add(task);
                                 }
                             }
                         }
-                        Log.d("CalendarPage", "Tasks found: " + taskList.size());
-                        taskAdapter.notifyDataSetChanged();
+                        Log.d("CalendarPage", "Tasks found: " + updatedTaskList.size());
+
+
+                        calendarRecAdapter.updateTaskList(updatedTaskList);
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        // Handle error
                         Log.e("CalendarPage", "Database error: " + databaseError.getMessage());
                     }
                 });
     }
+
 
     private long getDateInMillis(int year, int month, int day) {
         Calendar calendar = Calendar.getInstance();
