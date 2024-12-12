@@ -3,78 +3,79 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@color/backgroundColor"
     android:id="@+id/main">
 
-    <TextView
-        android:id="@+id/tvwelcome"
+    <LinearLayout
+        android:id="@+id/userheader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome, User!"
-        android:textSize="20sp"
-        android:textColor="@color/textPrimary"
-        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.057"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnaddtask"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Task"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toEndOf="@id/tvwelcome"
-        app:layout_constraintTop_toTopOf="@id/tvwelcome"
-        app:icon="@drawable/ic_add"
-        app:iconPadding="8dp"
-        app:iconGravity="start"
-        app:backgroundTint="@color/primaryColor" />
+        <ImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="Profile Picture"
+            android:src="@drawable/ic_profile_picture" />
 
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/taskrecyclerview"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:layout_marginTop="16dp"-->
-<!--        android:padding="8dp"-->
-<!--        android:clipToPadding="false"-->
-<!--        android:scrollbars="vertical"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/tvwelcome"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/bottomnav" />-->
+        <TextView
+            android:id="@+id/tvwelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:text="Welcome, User!"
+            android:textColor="@color/textPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/inprogresstext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
         android:text="In Progress"
         android:textColor="@color/textPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/in_progress_recyclerview"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnaddtask" />
+        app:layout_constraintTop_toBottomOf="@+id/userheader" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/in_progress_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:padding="8dp"
+        android:layout_height="250dp"
         android:clipToPadding="false"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/tvwelcome"
-        app:layout_constraintBottom_toTopOf="@id/completed_recyclerview" />
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:padding="8dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inprogresstext" />
 
     <TextView
         android:id="@+id/completedtext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Completed"
         android:textColor="@color/textPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/completed_recyclerview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/in_progress_recyclerview" />
@@ -82,13 +83,33 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/completed_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:padding="8dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:clipToPadding="false"
-        android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/in_progress_recyclerview"
-        app:layout_constraintBottom_toTopOf="@id/bottomnav" />
+        android:padding="8dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/completedtext" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnaddtask"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/circle_button"
+        app:backgroundTint="@color/primaryColor"
+        app:icon="@drawable/ic_add"
+        app:iconGravity="top"
+        app:iconSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.967"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.861" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomnav"
@@ -99,4 +120,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

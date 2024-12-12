@@ -45,9 +45,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.taskTitle.setText(task.getTaskTitle());
         holder.taskDescription.setText(task.getTaskDescription());
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateCreated = simpleDateFormat.format(new Date(task.getTaskCreated()));
-        holder.taskDateCreated.setText("Date Created: " + dateCreated);
+        holder.taskDateCreated.setText(dateCreated);
 
         // Set the checkbox state based on task status
         holder.checkBox.setChecked(task.getTaskStatus().equals("completed"));

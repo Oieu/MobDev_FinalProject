@@ -85,6 +85,8 @@ public class ProfileActivity extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_tasks:
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    finish();
                     return true;
                 case R.id.navigation_calendar:
                     startActivity(new Intent(getApplicationContext(), CalendarPage.class));

@@ -43,7 +43,7 @@ public class LoginPage extends AppCompatActivity {
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                            Intent intent = new Intent(LoginPage.this, DashBoard.class);
                             startActivity(intent);
                             finish();
                         } else {
