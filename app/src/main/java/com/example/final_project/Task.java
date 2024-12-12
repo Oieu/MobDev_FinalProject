@@ -1,7 +1,5 @@
 package com.example.final_project;
 
-import java.util.Date;
-
 public class Task {
     private String taskId;
     private String taskTitle;
@@ -9,6 +7,7 @@ public class Task {
     private long taskCreated;
     private String userId;
     private String taskStatus;
+    private boolean isDeleted;
 
     public Task() {}
 
@@ -19,6 +18,7 @@ public class Task {
         this.taskCreated = taskCreated;
         this.userId = userId;
         this.taskStatus = taskStatus;
+        this.isDeleted = false;
     }
 
     public String getTaskId() {
@@ -67,5 +67,13 @@ public class Task {
 
     public void setTaskStatus(String taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

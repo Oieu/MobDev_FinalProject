@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
                 for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
                     Task task = taskSnapshot.getValue(Task.class);
-                    if (task.getUserId().equals(mAuth.getCurrentUser().getUid())) {
+                    if (task.getUserId().equals(mAuth.getCurrentUser().getUid()) && !task.isDeleted()) {
                         if (task.getTaskStatus().equals("in progress")) {
                             inProgressTasks.add(task);
                         } else if (task.getTaskStatus().equals("completed")) {
@@ -119,15 +119,23 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
 
     @Override
     public void onTaskStatusChanged(Task task) {
-        dbRef.child(task.getTaskId()).setValue(task);
-        if (task.getTaskStatus().equals("completed")) {
-            inProgressTasks.remove(task);
-            completedTasks.add(task);
+        if (task.isDeleted()) {
+            // Instead of directly setting the value in Firebase, we set the deleted state in the Task object
+            task.setDeleted(true);
+            dbRef.child(task.getTaskId()).setValue(task); // Update the task in Firebase
         } else {
-            inProgressTasks.add(task);
-            completedTasks.remove(task);
+            dbRef.child(task.getTaskId()).setValue(task); // Update the task in Firebase
+            if (task.getTaskStatus().equals("completed")) {
+                inProgressTasks.remove(task);
+                completedTasks.add(task);
+            } else {
+                inProgressTasks.add(task);
+                completedTasks.remove(task);
+            }
         }
         inProgressAdapter.notifyDataSetChanged();
         completedAdapter.notifyDataSetChanged();
     }
+
+
 }
