@@ -102,9 +102,8 @@ public class MainActivity extends AppCompatActivity {
                     Task task = taskSnapshot.getValue(Task.class);
                     if (task != null) {
                         task.setTaskId(taskSnapshot.getKey());
-                        String taskStatus = task.getTaskStatus(); // Cache taskStatus
+                        String taskStatus = task.getTaskStatus();
 
-                        // Null-safe check for taskStatus
                         if ("in progress".equals(taskStatus)) {
                             inProgressTaskList.add(task);
                         } else if ("completed".equals(taskStatus)) {
@@ -112,36 +111,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-
-                inProgressTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
-                    @Override
-                    public void onTaskStatusChanged(Task task) {
-                        if ("completed".equals(task.getTaskStatus())) {
-                            inProgressTaskList.remove(task);
-                            completedTaskList.add(task);
-                        } else {
-                            inProgressTaskList.add(task);
-                            completedTaskList.remove(task);
-                        }
-                        inProgressTaskAdapter.notifyDataSetChanged();
-                        completedTaskAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                completedTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
-                    @Override
-                    public void onTaskStatusChanged(Task task) {
-                        if ("in progress".equals(task.getTaskStatus())) {
-                            completedTaskList.remove(task);
-                            inProgressTaskList.add(task);
-                        } else {
-                            completedTaskList.add(task);
-                            inProgressTaskList.remove(task);
-                        }
-                        inProgressTaskAdapter.notifyDataSetChanged();
-                        completedTaskAdapter.notifyDataSetChanged();
-                    }
-                });
 
                 inProgressTaskAdapter.notifyDataSetChanged();
                 completedTaskAdapter.notifyDataSetChanged();
