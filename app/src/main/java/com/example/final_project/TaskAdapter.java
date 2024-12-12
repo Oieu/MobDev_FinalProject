@@ -13,109 +13,87 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
-    private final List<Task> taskList;
-    private final DatabaseReference dbRef;
-    private boolean isCompleted;
-
-    private OnTaskStatusChangedListener onTaskStatusChangedListener;
+    private ArrayList<Task> tasks;
+    private OnTaskStatusChangedListener listener;
 
     public interface OnTaskStatusChangedListener {
         void onTaskStatusChanged(Task task);
     }
 
-    public void setOnTaskStatusChangedListener(OnTaskStatusChangedListener onTaskStatusChangedListener) {
-        this.onTaskStatusChangedListener = onTaskStatusChangedListener;
-    }
-
-    public TaskAdapter(List<Task> taskList, boolean isCompleted) {
-        this.taskList = taskList;
-        this.dbRef = FirebaseDatabase.getInstance(FirebaseConfig.dbURL)
-                .getReference("tasks");
-        this.isCompleted = isCompleted;
+    public TaskAdapter(ArrayList<Task> tasks, OnTaskStatusChangedListener listener) {
+        this.tasks = tasks;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_task, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_task, parent, false);
         return new TaskViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        Task task = taskList.get(position);
+        Task task = tasks.get(position);
         holder.taskTitle.setText(task.getTaskTitle());
         holder.taskDescription.setText(task.getTaskDescription());
 
-        if (task.getTaskCreated() != 0) {
-            Date date = new Date(task.getTaskCreated());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String dateString = dateFormat.format(date);
-            holder.taskDate.setText(dateString);
-        } else {
-            holder.taskDate.setText("No Date");
-        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateCreated = simpleDateFormat.format(new Date(task.getTaskCreated()));
+        holder.taskDateCreated.setText("Date Created: " + dateCreated);
 
-        String taskStatus = task.getTaskStatus() != null ? task.getTaskStatus() : "in progress";
+        // Set the checkbox state based on task status
+        holder.checkBox.setChecked(task.getTaskStatus().equals("completed"));
 
-        if (taskStatus.equals("completed")) {
+        // Apply strikethrough if the task is completed
+        if (task.getTaskStatus().equals("completed")) {
             holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.cbTaskCompleted.setChecked(true);
+            holder.taskDescription.setPaintFlags(holder.taskDescription.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
-            holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.cbTaskCompleted.setChecked(false);
+            holder.taskTitle.setPaintFlags(holder.taskTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.taskDescription.setPaintFlags(holder.taskDescription.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
 
-
-        holder.cbTaskCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (task.getTaskId() != null) {
-                // Update task status based on checkbox state
-                String newStatus = isChecked ? "completed" : "in progress";
-                dbRef.child(task.getTaskId()).child("taskStatus").setValue(newStatus)
-                        .addOnSuccessListener(aVoid -> {
-                            // Optionally notify the listener if set
-                            if (onTaskStatusChangedListener != null) {
-                                task.setTaskStatus(newStatus);
-                                onTaskStatusChangedListener.onTaskStatusChanged(task);
-                            }
-                        });
+        holder.checkBox.setOnClickListener(v -> {
+            if (holder.checkBox.isChecked()) {
+                task.setTaskStatus("completed");
+            } else {
+                task.setTaskStatus("in progress");
             }
-        });
-
-        holder.btnDeleteTask.setOnClickListener(v -> {
-            if (task.getTaskId() != null) {
-                dbRef.child(task.getTaskId()).removeValue().addOnSuccessListener(aVoid -> {
-                    taskList.remove(position);
-                    notifyItemRemoved(position);
-                });
-            }
+            listener.onTaskStatusChanged(task);
         });
     }
 
     @Override
     public int getItemCount() {
-        return taskList.size();
+        return tasks.size();
     }
 
-    static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView taskTitle, taskDescription, taskDate;
-        CheckBox cbTaskCompleted;
-        Button btnDeleteTask;
+    public class TaskViewHolder extends RecyclerView.ViewHolder {
+        public TextView taskTitle, taskDescription, taskDateCreated;
+        public CheckBox checkBox;
+        public Button btnDeleteTask;
 
-        TaskViewHolder(@NonNull View itemView) {
+        public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             taskTitle = itemView.findViewById(R.id.tasktitle);
-            cbTaskCompleted = itemView.findViewById(R.id.cbtaskcompleted);
-            btnDeleteTask = itemView.findViewById(R.id.btndeletetask);
             taskDescription = itemView.findViewById(R.id.taskdesc);
-            taskDate = itemView.findViewById(R.id.taskdatecreate);
+            taskDateCreated = itemView.findViewById(R.id.taskdatecreate);
+            checkBox = itemView.findViewById(R.id.cbtaskcompleted);
+            btnDeleteTask = itemView.findViewById(R.id.btndeletetask);
+
+            btnDeleteTask.setOnClickListener(v -> {
+                Task task = tasks.get(getAdapterPosition());
+                task.setDeleted(true);
+                listener.onTaskStatusChanged(task);
+            });
         }
     }
 }

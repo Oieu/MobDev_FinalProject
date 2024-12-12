@@ -5,38 +5,61 @@ public class Task {
     private String taskTitle;
     private String taskDescription;
     private long taskCreated;
-    private boolean isCompleted;
     private String userId;
     private String taskStatus;
+    private boolean isDeleted;
 
     public Task() {}
 
-    public Task(String taskId, String taskTitle, String taskDescription, long taskCreated, boolean isCompleted, String userId, String taskStatus) {
+    public Task(String taskId, String taskTitle, String taskDescription, long taskCreated, String userId, String taskStatus) {
         this.taskId = taskId;
         this.taskTitle = taskTitle;
         this.taskDescription = taskDescription;
         this.taskCreated = taskCreated;
-        this.isCompleted = isCompleted;
         this.userId = userId;
         this.taskStatus = taskStatus;
+        this.isDeleted = false;
     }
 
-    // Getters and setters
-    public String getTaskId() { return taskId; }
-    public void setTaskId(String taskId) { this.taskId = taskId; }
+    public String getTaskId() {
+        return taskId;
+    }
 
-    public String getTaskTitle() { return taskTitle; }
-    public void setTaskTitle(String taskTitle) { this.taskTitle = taskTitle; }
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-    public String getTaskDescription() { return taskDescription; }
-    public void setTaskDescription(String taskDescription) { this.taskDescription = taskDescription; }
+    public String getTaskTitle() {
+        return taskTitle;
+    }
 
-    public long getTaskCreated() { return taskCreated; }
-    public void setTaskCreated(long taskCreated) { this.taskCreated = taskCreated; }
+    public void setTaskTitle(String taskTitle) {
+        this.taskTitle = taskTitle;
+    }
 
+    public String getTaskDescription() {
+        return taskDescription;
+    }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
+
+    public long getTaskCreated() {
+        return taskCreated;
+    }
+
+    public void setTaskCreated(long taskCreated) {
+        this.taskCreated = taskCreated;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getTaskStatus() {
         return taskStatus;
@@ -44,5 +67,13 @@ public class Task {
 
     public void setTaskStatus(String taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
