@@ -111,9 +111,10 @@ public class DashBoard extends AppCompatActivity {
                 int completedTasksCount = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-//                    if (task != null && task.isCompleted()) {
-//                        completedTasksCount++;
-//                    }
+
+                    if (task != null && !task.isDeleted() && task.getTaskStatus().equals("completed")) {
+                        completedTasksCount++;
+                    }
                 }
                 tvCompletedTasks.setText(String.valueOf(completedTasksCount));
             }
@@ -132,16 +133,17 @@ public class DashBoard extends AppCompatActivity {
                 int pendingTasksCount = 0;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Task task = snapshot.getValue(Task.class);
-//                    if (task != null && !task.isCompleted()) {
-//                        pendingTasksCount++;
-//                    }
+
+                    if (task != null && !task.isDeleted() && "in progress".equalsIgnoreCase(task.getTaskStatus())) {
+                        pendingTasksCount++;
+                    }
                 }
                 tvPendingTasks.setText(String.valueOf(pendingTasksCount));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
+
             }
         });
     }
@@ -159,8 +161,8 @@ public class DashBoard extends AppCompatActivity {
                         taskList.clear();
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             Task task = snapshot.getValue(Task.class);
-                            if (task != null && userId != null && userId.equals(task.getUserId())) {
-                                taskList.add(task);
+                            if (task != null && userId != null && userId.equals(task.getUserId()) && !task.isDeleted()) {
+                                taskList.add(task);  // Add only tasks that are not deleted
                             }
                         }
                         taskAdapter.notifyDataSetChanged();
@@ -172,6 +174,7 @@ public class DashBoard extends AppCompatActivity {
                     }
                 });
     }
+
 
 
     private long getStartOfDayInMillis(Date date) {
