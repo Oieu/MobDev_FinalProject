@@ -1,6 +1,5 @@
 package com.example.final_project;
 
-import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
