@@ -1,5 +1,6 @@
 package com.example.final_project;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,14 +10,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
@@ -61,6 +57,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.taskDescription.setPaintFlags(holder.taskDescription.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
 
+        // Set the edit button click listener
+        holder.btnEditTask.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), EditTask.class);
+            intent.putExtra("TASK_ID", task.getTaskId());
+            intent.putExtra("TASK_TITLE", task.getTaskTitle());
+            intent.putExtra("TASK_DESCRIPTION", task.getTaskDescription());
+            holder.itemView.getContext().startActivity(intent);
+        });
+
         holder.checkBox.setOnClickListener(v -> {
             if (holder.checkBox.isChecked()) {
                 task.setTaskStatus("completed");
@@ -79,7 +84,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public class TaskViewHolder extends RecyclerView.ViewHolder {
         public TextView taskTitle, taskDescription, taskDateCreated;
         public CheckBox checkBox;
-        public Button btnDeleteTask;
+        public Button btnEditTask; // Add the edit button
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -87,13 +92,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             taskDescription = itemView.findViewById(R.id.taskdesc);
             taskDateCreated = itemView.findViewById(R.id.taskdatecreate);
             checkBox = itemView.findViewById(R.id.cbtaskcompleted);
-            btnDeleteTask = itemView.findViewById(R.id.btndeletetask);
-
-            btnDeleteTask.setOnClickListener(v -> {
-                Task task = tasks.get(getAdapterPosition());
-                task.setDeleted(true);
-                listener.onTaskStatusChanged(task);
-            });
+            btnEditTask = itemView.findViewById(R.id.btnedittask); // Initialize the edit button
         }
     }
 }
