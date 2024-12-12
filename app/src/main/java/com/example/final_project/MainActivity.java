@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         String userId = mAuth.getCurrentUser().getUid(); // Get the user ID
 
-        dbRef = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        dbRef = FirebaseDatabase.getInstance()
                 .getReference("tasks");
 
         recyclerView = findViewById(R.id.taskrecyclerview);
@@ -51,22 +51,30 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bottomNav = findViewById(R.id.bottomnav);
-        bottomNav.setOnNavigationItemSelectedListener(item -> {
+
+        bottomNav.setSelectedItemId(R.id.navigation_tasks);
+        bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    startActivity(new Intent(this, MainActivity.class));
+                case R.id.navigation_tasks:
                     return true;
                 case R.id.navigation_calendar:
-                    startActivity(new Intent(this, CalendarPage.class));
+                    startActivity(new Intent(getApplicationContext(),  CalendarPage.class));
+                    finish();
                     return true;
-//                case R.id.navigation_tasks:
-//                    startActivity(new Intent(this, TasksActivity.class));
-//                    return true;
+
+                case R.id.navigation_home:
+                    startActivity(new Intent(getApplicationContext(), DashBoard.class));
+                    finish();
+                    return  true;
+
                 case R.id.navigation_account:
-                    startActivity(new Intent(this, ProfileActivity.class));
-                    return true;
+                    startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                    finish();
+                    return  true;
+
+                default:
+                    return false;
             }
-            return false;
         });
     }
 
@@ -77,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 taskList.clear();
                 for (DataSnapshot taskSnapshot : dataSnapshot.getChildren()) {
                     Task task = taskSnapshot.getValue(Task.class);
-                    if (task != null) {
+                    if (task != null && !task.isCompleted()) {
                         task.setTaskId(taskSnapshot.getKey());
                         taskList.add(task);
                     }
@@ -91,4 +99,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }

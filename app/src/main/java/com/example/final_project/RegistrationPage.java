@@ -37,7 +37,7 @@ public class RegistrationPage extends AppCompatActivity {
         backToLogin = findViewById(R.id.tvLoginLink);
 
         mAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance("https://finalproject-848e0-default-rtdb.asia-southeast1.firebasedatabase.app/")
+        databaseReference = FirebaseDatabase.getInstance()
                 .getReference("Users");
 
         btnRegister.setOnClickListener(v -> {

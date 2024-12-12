@@ -51,7 +51,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.taskDate.setText("No Date");
         }
 
-        holder.cbTaskCompleted.setChecked(task.isDone());
+//        holder.cbTaskCompleted.setChecked(task.isDone());
 
         holder.cbTaskCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);

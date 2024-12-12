@@ -1,7 +1,5 @@
 package com.example.final_project;
 
-import java.util.Date;
-
 public class Task {
     private String taskId;
     private String taskTitle;
@@ -21,7 +19,7 @@ public class Task {
         this.userId = userId;
     }
 
-
+    // Getters and setters
     public String getTaskId() { return taskId; }
     public void setTaskId(String taskId) { this.taskId = taskId; }
 
@@ -34,7 +32,7 @@ public class Task {
     public long getTaskCreated() { return taskCreated; }
     public void setTaskCreated(long taskCreated) { this.taskCreated = taskCreated; }
 
-    public boolean isDone() { return isCompleted; }
+    public boolean isCompleted() { return isCompleted; }
     public void setCompleted(boolean completed) { isCompleted = completed; }
 
     public String getUserId() { return userId; }

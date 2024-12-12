@@ -59,13 +59,13 @@ public class CalendarPage extends AppCompatActivity {
                 case R.id.navigation_calendar:
                     return true;
                 case R.id.navigation_home:
+                    startActivity(new Intent(getApplicationContext(), DashBoard.class));
+                    finish();
+                    return true;
+                case R.id.navigation_tasks:
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     finish();
                     return true;
-//                case R.id.navigation_tasks:
-//                    startActivity(new Intent(getApplicationContext(), TasksActivity.class));
-//                    finish();
-//                    return true;
                 case R.id.navigation_account:
                     startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                     finish();
@@ -101,7 +101,7 @@ public class CalendarPage extends AppCompatActivity {
                             }
                         }
                         Log.d("CalendarPage", "Tasks found: " + taskList.size());
-                        taskAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the RecyclerView
+                        taskAdapter.notifyDataSetChanged();
                     }
 
                     @Override
