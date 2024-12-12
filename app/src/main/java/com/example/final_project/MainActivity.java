@@ -3,6 +3,10 @@ package com.example.final_project;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,18 +21,21 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTaskStatusChangedListener {
 
-    private DatabaseReference dbRef;
     private RecyclerView inProgressRecyclerView;
     private RecyclerView completedRecyclerView;
-    private TaskAdapter inProgressTaskAdapter;
-    private TaskAdapter completedTaskAdapter;
-    private List<Task> inProgressTaskList;
-    private List<Task> completedTaskList;
-    private FirebaseAuth mAuth;
     private BottomNavigationView bottomNav;
-    private ValueEventListener listener;
+    private TextView tvWelcome, inProgress, completed;
+    private Button btnAddTask;
+
+    private ArrayList<Task> inProgressTasks = new ArrayList<>();
+    private ArrayList<Task> completedTasks = new ArrayList<>();
+    private TaskAdapter inProgressAdapter;
+    private TaskAdapter completedAdapter;
+
+    private DatabaseReference dbRef;
+    private FirebaseAuth mAuth;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -44,27 +51,28 @@ public class MainActivity extends AppCompatActivity {
 
         inProgressRecyclerView = findViewById(R.id.in_progress_recyclerview);
         completedRecyclerView = findViewById(R.id.completed_recyclerview);
+        btnAddTask = findViewById(R.id.btnaddtask);
+        tvWelcome = findViewById(R.id.tvwelcome);
+        inProgress = findViewById(R.id.inprogresstext);
+        completed = findViewById(R.id.completedtext);
+        bottomNav = findViewById(R.id.bottomnav);
 
-        inProgressTaskList = new ArrayList<>();
-        completedTaskList = new ArrayList<>();
+        inProgressAdapter = new TaskAdapter(inProgressTasks, this);
+        completedAdapter = new TaskAdapter(completedTasks, this);
 
-        inProgressTaskAdapter = new TaskAdapter(inProgressTaskList, false);
-        completedTaskAdapter = new TaskAdapter(completedTaskList, true);
-
-        inProgressRecyclerView.setAdapter(inProgressTaskAdapter);
-        completedRecyclerView.setAdapter(completedTaskAdapter);
+        inProgressRecyclerView.setAdapter(inProgressAdapter);
+        completedRecyclerView.setAdapter(completedAdapter);
 
         inProgressRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         completedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        fetchTasksForUser  (userId);
+        fetchTasksFromFirebase();
 
-        findViewById(R.id.btnaddtask).setOnClickListener(v -> {
+        btnAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddTask.class);
             startActivity(intent);
         });
 
-        bottomNav = findViewById(R.id.bottomnav);
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
@@ -73,84 +81,53 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_calendar:
                     startActivity(new Intent(this, CalendarPage.class));
                     return true;
-//                case R.id.navigation_tasks:
-//                    startActivity(new Intent(this, TasksActivity.class));
-//                    return true;
-                case R.id.navigation_account:
-                    startActivity(new Intent(this, ProfileActivity.class));
-                    return true;
+                // Add more navigation items here
+                default:
+                    return false;
             }
-            return false;
         });
     }
 
-    private void fetchTasksForUser (String userId) {
-        listener = new ValueEventListener() {
+    private void fetchTasksFromFirebase() {
+        dbRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                inProgressTaskList.clear();
-                completedTaskList.clear();
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                inProgressTasks.clear();
+                completedTasks.clear();
 
-                for (DataSnapshot taskSnapshot : dataSnapshot.getChildren()) {
+                for (DataSnapshot taskSnapshot : snapshot.getChildren()) {
                     Task task = taskSnapshot.getValue(Task.class);
-                    if (task != null) {
-                        task.setTaskId(taskSnapshot.getKey());
-
+                    if (task.getUserId().equals(mAuth.getCurrentUser().getUid())) {
                         if (task.getTaskStatus().equals("in progress")) {
-                            inProgressTaskList.add(task);
+                            inProgressTasks.add(task);
                         } else if (task.getTaskStatus().equals("completed")) {
-                            completedTaskList.add(task);
+                            completedTasks.add(task);
                         }
                     }
                 }
 
-                inProgressTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
-                    @Override
-                    public void onTaskStatusChanged(Task task) {
-                        if (task.getTaskStatus().equals("completed")) {
-                            inProgressTaskList.remove(task);
-                            completedTaskList.add(task);
-                        } else {
-                            inProgressTaskList.add(task);
-                            completedTaskList.remove(task);
-                        }
-                        inProgressTaskAdapter.notifyDataSetChanged();
-                        completedTaskAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                completedTaskAdapter.setOnTaskStatusChangedListener(new TaskAdapter.OnTaskStatusChangedListener() {
-                    @Override
-                    public void onTaskStatusChanged(Task task) {
-                        if (task.getTaskStatus().equals("in progress")) {
-                            completedTaskList.remove(task);
-                            inProgressTaskList.add(task);
-                        } else {
-                            completedTaskList.add(task);
-                            inProgressTaskList.remove(task);
-                        }
-                        inProgressTaskAdapter.notifyDataSetChanged();
-                        completedTaskAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                inProgressTaskAdapter.notifyDataSetChanged();
-                completedTaskAdapter.notifyDataSetChanged();
+                inProgressAdapter.notifyDataSetChanged();
+                completedAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this, "Error fetching tasks", Toast.LENGTH_SHORT).show();
             }
-        };
-        dbRef.orderByChild("userId").equalTo(userId).addValueEventListener(listener);
+        });
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (listener != null) {
-            dbRef.removeEventListener(listener);
+    public void onTaskStatusChanged(Task task) {
+        dbRef.child(task.getTaskId()).setValue(task);
+        if (task.getTaskStatus().equals("completed")) {
+            inProgressTasks.remove(task);
+            completedTasks.add(task);
+        } else {
+            inProgressTasks.add(task);
+            completedTasks.remove(task);
         }
+        inProgressAdapter.notifyDataSetChanged();
+        completedAdapter.notifyDataSetChanged();
     }
 }
